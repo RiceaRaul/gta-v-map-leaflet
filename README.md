@@ -1,5 +1,5 @@
-# GTA V MAP LEAFLEAT
-GTA V MAP LEAFLEAT is a MAP  based on LEAFLET.
+# GTA V MAP LEAFLET 
+GTA V MAP LEAFLET is a MAP  based on LEAFLET.
 
 ## Features
 
@@ -42,4 +42,4 @@ Custom blip
 !["Customblip Screnshot"](https://cdn.discordapp.com/attachments/691276350962794496/908677500069109800/unknown.png)
 ## License
 
-GTA V MAP LEAFLEAT is licensed under MIT License.
+GTA V MAP LEAFLET is licensed under MIT License.
