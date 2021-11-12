@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
    <head>
       <title>GTA V MAP</title>
