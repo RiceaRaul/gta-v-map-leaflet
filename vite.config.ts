@@ -9,13 +9,5 @@ export default defineConfig({
       formats: ['es', 'umd'],
       fileName: (format) => `gta-v-map.${format}.js`,
     },
-    rollupOptions: {
-      external: ['leaflet'],
-      output: {
-        globals: {
-          leaflet: 'L',
-        },
-      },
-    },
   },
 });

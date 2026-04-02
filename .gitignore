@@ -2,3 +2,5 @@ node_modules
 dist
 *.local
 public
+.angular
+demo/angular/package-lock.json

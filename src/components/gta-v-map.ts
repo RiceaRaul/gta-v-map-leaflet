@@ -532,8 +532,9 @@ export class GtaVMap extends LitElement {
     }
 
     // Rebuild declarative markers
+    const parsed = typeof this.markers === 'string' ? JSON.parse(this.markers) as GtaMarker[] : this.markers;
     const declarativeEntries: GtaMarkerEntry[] = [];
-    for (const marker of this.markers) {
+    for (const marker of parsed) {
       const id = marker.id ?? generateId();
       const group = marker.group ?? DEFAULT_MARKER_GROUP;
       const entry: GtaMarkerEntry = { ...marker, id, group };
@@ -598,7 +599,8 @@ export class GtaVMap extends LitElement {
     this._shapeEntries.length = 0;
 
     // Rebuild from declarative shapes
-    for (const shape of this.shapes) {
+    const parsedShapes = typeof this.shapes === 'string' ? JSON.parse(this.shapes) as GtaShape[] : this.shapes;
+    for (const shape of parsedShapes) {
       const { entry } = upsertShapeEntry(this._shapeEntries, shape);
       this._addLeafletShape(entry);
     }
@@ -607,8 +609,9 @@ export class GtaVMap extends LitElement {
   // --- Private: Heatmap ---
 
   private _getHeatmapData(): [number, number][] {
+    const parsed = typeof this.markers === 'string' ? JSON.parse(this.markers) as GtaMarker[] : this.markers;
     const allMarkers = [
-      ...this.markers,
+      ...parsed,
       ...this._markerEntries,
     ];
     return allMarkers.map((m) => [m.y, m.x]);
