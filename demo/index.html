@@ -25,7 +25,7 @@
     }
 
     #controls {
-      width: 300px;
+      width: 320px;
       padding: 16px;
       background: #222;
       overflow-y: auto;
@@ -48,6 +48,7 @@
       font-size: 13px;
     }
     button:hover { background: #4a4a4a; }
+    button.active { background: #2a6a2a; border-color: #4a8a4a; }
 
     #event-log {
       margin-top: 12px;
@@ -72,18 +73,57 @@
         tile-base-url="/mapStyles"
         blips-url="/blips"
         show-layer-control
-        markers='[{"x": 0, "y": 0, "icon": 1, "popup": "Spawn Point"}]'
+        markers='[
+          {"x": 0, "y": 0, "icon": 1, "popup": "<b>Spawn Point</b><br><i>Default location</i>", "group": "Spawns"},
+          {"x": 500, "y": 500, "icon": 1, "popup": "<b>Safe House</b>", "group": "Properties"},
+          {"x": -800, "y": 200, "icon": 1, "popup": "<b>Shop</b>", "group": "Shops"}
+        ]'
+        shapes='[
+          {
+            "type": "polygon",
+            "points": [[-200, -400], [300, -400], [300, 100], [-200, 100]],
+            "color": "#ff4444",
+            "fillColor": "#ff4444",
+            "fillOpacity": 0.15,
+            "popup": "<b>Danger Zone</b>",
+            "group": "Zones",
+            "label": {"text": "Danger Zone", "color": "#ff4444", "fontSize": 14}
+          },
+          {
+            "type": "polyline",
+            "points": [[0, 0], [500, 500], [1000, 200]],
+            "color": "#44ff44",
+            "weight": 4,
+            "popup": "<b>Route A</b>",
+            "group": "Routes",
+            "label": {"text": "Route A", "color": "#44ff44"}
+          }
+        ]'
       ></gta-v-map>
     </div>
 
     <div id="controls">
       <h2>GTA V Map - Component Demo</h2>
 
-      <h3>Imperative API</h3>
+      <h3>Markers</h3>
       <button id="btn-add-marker">addMarker() - Random</button>
+      <button id="btn-upsert-marker">addMarker() - Upsert "hq"</button>
       <button id="btn-remove-last">removeMarker() - Last Added</button>
+      <button id="btn-clear-markers">clearMarkers()</button>
+      <button id="btn-get-markers">getMarkers() - Log All</button>
 
-      <h3>Property Changes</h3>
+      <h3>Place Mode</h3>
+      <button id="btn-toggle-place">Toggle Place Mode</button>
+
+      <h3>Shapes</h3>
+      <button id="btn-add-polygon">addShape() - Random Polygon</button>
+      <button id="btn-add-polyline">addShape() - Random Polyline</button>
+      <button id="btn-clear-shapes">clearShapes()</button>
+
+      <h3>Heatmap</h3>
+      <button id="btn-toggle-heatmap">Toggle Heatmap</button>
+
+      <h3>Map Controls</h3>
       <button id="btn-zoom-in">Zoom In</button>
       <button id="btn-zoom-out">Zoom Out</button>
       <button id="btn-toggle-control">Toggle Layer Control</button>
@@ -105,7 +145,8 @@
 
     function logEvent(name, detail) {
       const entry = document.createElement('div');
-      entry.textContent = `${name}: ${JSON.stringify(detail)}`;
+      const text = typeof detail === 'object' ? JSON.stringify(detail) : detail;
+      entry.textContent = `${name}: ${text}`;
       log.prepend(entry);
     }
 
@@ -113,25 +154,119 @@
     map.addEventListener('map-ready', () => logEvent('map-ready', {}));
     map.addEventListener('map-click', (e) => logEvent('map-click', e.detail));
     map.addEventListener('marker-click', (e) => logEvent('marker-click', e.detail));
+    map.addEventListener('marker-placed', (e) => {
+      logEvent('marker-placed', e.detail);
+      // Auto-place a marker when in place mode
+      map.addMarker({
+        ...e.detail,
+        icon: 1,
+        popup: `<b>Placed</b><br>x: ${e.detail.x.toFixed(1)}, y: ${e.detail.y.toFixed(1)}`,
+      });
+    });
 
-    // Imperative marker API
+    // Add random marker
     document.getElementById('btn-add-marker').addEventListener('click', () => {
       const id = map.addMarker({
         x: (Math.random() - 0.5) * 4000,
         y: (Math.random() - 0.5) * 4000,
         icon: 1,
-        popup: `Random marker #${addedIds.length + 1}`,
+        popup: `<b>Random #${addedIds.length + 1}</b><br><i>Click to inspect</i>`,
       });
       addedIds.push(id);
       logEvent('addMarker', { id });
     });
 
+    // Upsert marker with fixed id
+    document.getElementById('btn-upsert-marker').addEventListener('click', () => {
+      const id = map.addMarker({
+        id: 'hq',
+        x: (Math.random() - 0.5) * 2000,
+        y: (Math.random() - 0.5) * 2000,
+        icon: 1,
+        popup: '<b>HQ</b><br>Moves each click (upsert)',
+      });
+      logEvent('upsert', { id });
+    });
+
+    // Remove last
     document.getElementById('btn-remove-last').addEventListener('click', () => {
       const id = addedIds.pop();
       if (id) {
         map.removeMarker(id);
         logEvent('removeMarker', { id });
       }
+    });
+
+    // Clear all
+    document.getElementById('btn-clear-markers').addEventListener('click', () => {
+      map.clearMarkers();
+      addedIds.length = 0;
+      logEvent('clearMarkers', 'done');
+    });
+
+    // Get all markers
+    document.getElementById('btn-get-markers').addEventListener('click', () => {
+      const markers = map.getMarkers();
+      logEvent('getMarkers', `${markers.length} markers`);
+      markers.forEach((m) => logEvent('  marker', m));
+    });
+
+    // Place mode toggle
+    const placeBtn = document.getElementById('btn-toggle-place');
+    placeBtn.addEventListener('click', () => {
+      map.placeMode = !map.placeMode;
+      placeBtn.classList.toggle('active', map.placeMode);
+      placeBtn.textContent = map.placeMode ? 'Place Mode: ON' : 'Toggle Place Mode';
+    });
+
+    // Shapes
+    document.getElementById('btn-add-polygon').addEventListener('click', () => {
+      const cx = (Math.random() - 0.5) * 2000;
+      const cy = (Math.random() - 0.5) * 2000;
+      const size = 200 + Math.random() * 300;
+      const id = map.addShape({
+        type: 'polygon',
+        points: [
+          [cx - size, cy - size],
+          [cx + size, cy - size],
+          [cx + size, cy + size],
+          [cx - size, cy + size],
+        ],
+        color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+        fillOpacity: 0.2,
+        group: 'Zones',
+        label: { text: 'Zone', color: '#fff', fontSize: 12 },
+      });
+      logEvent('addShape polygon', { id });
+    });
+
+    document.getElementById('btn-add-polyline').addEventListener('click', () => {
+      const points = Array.from({ length: 3 + Math.floor(Math.random() * 4) }, () => [
+        (Math.random() - 0.5) * 3000,
+        (Math.random() - 0.5) * 3000,
+      ]);
+      const id = map.addShape({
+        type: 'polyline',
+        points,
+        color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+        weight: 3,
+        group: 'Routes',
+        label: { text: 'Route', color: '#fff' },
+      });
+      logEvent('addShape polyline', { id });
+    });
+
+    document.getElementById('btn-clear-shapes').addEventListener('click', () => {
+      map.clearShapes();
+      logEvent('clearShapes', 'done');
+    });
+
+    // Heatmap
+    const heatBtn = document.getElementById('btn-toggle-heatmap');
+    heatBtn.addEventListener('click', () => {
+      map.showHeatmap = !map.showHeatmap;
+      heatBtn.classList.toggle('active', map.showHeatmap);
+      heatBtn.textContent = map.showHeatmap ? 'Heatmap: ON' : 'Toggle Heatmap';
     });
 
     // Zoom

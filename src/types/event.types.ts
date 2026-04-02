@@ -10,6 +10,11 @@ export interface MarkerClickDetail extends GtaMarker {
   readonly id: string;
 }
 
+export interface MarkerPlacedDetail {
+  readonly x: number;
+  readonly y: number;
+}
+
 export interface MapReadyDetail {
   readonly map: L.Map;
 }
@@ -18,4 +23,5 @@ export interface GtaVMapEventMap {
   'map-ready': CustomEvent<MapReadyDetail>;
   'map-click': CustomEvent<MapClickDetail>;
   'marker-click': CustomEvent<MarkerClickDetail>;
+  'marker-placed': CustomEvent<MarkerPlacedDetail>;
 }
