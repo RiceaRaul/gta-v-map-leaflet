@@ -1,5 +1,6 @@
 import type { MapStyle, LatLngBoundsTuple } from '../types/index.js';
 
+/** Default configuration values for the map component. */
 export const DEFAULT_MAP_CONFIG = {
   zoom: 3,
   minZoom: 1,

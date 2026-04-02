@@ -1,3 +1,4 @@
+/** CSS color used for the ocean / map background. */
 export const WATER_COLOR = '#1a3a4a' as const;
 
 /** 1x1 ocean-colored PNG as data URI for missing/error tiles */

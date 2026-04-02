@@ -1,5 +1,6 @@
 import type L from 'leaflet';
 
+/** Configuration for a text label displayed at a shape's centroid. */
 export interface ShapeLabel {
   text: string;
   className?: string;
@@ -7,6 +8,7 @@ export interface ShapeLabel {
   color?: string;
 }
 
+/** Input shape definition provided by the consumer. */
 export interface GtaShape {
   type: 'polyline' | 'polygon';
   points: [number, number][];
@@ -21,6 +23,7 @@ export interface GtaShape {
   label?: ShapeLabel;
 }
 
+/** Internal shape entry with defaults applied and optional Leaflet instances. */
 export interface GtaShapeEntry extends Required<Pick<GtaShape, 'type' | 'points' | 'id' | 'group'>> {
   color: string;
   weight: number;
@@ -33,6 +36,7 @@ export interface GtaShapeEntry extends Required<Pick<GtaShape, 'type' | 'points'
   _labelMarker?: L.Marker;
 }
 
+/** Default style values applied to shapes when the consumer omits them. */
 export const SHAPE_DEFAULTS = {
   color: '#3388ff',
   weight: 3,

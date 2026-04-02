@@ -30,12 +30,22 @@ import type {
 } from '../types/index.js';
 import { gtaVMapStyles } from './gta-v-map.styles.js';
 
+/**
+ * `<gta-v-map>` -- a Lit web component that renders an interactive GTA V map
+ * using Leaflet with support for markers, shapes, heatmaps, and layer controls.
+ *
+ * @fires map-ready - Emitted once the Leaflet map is initialized.
+ * @fires map-click - Emitted when the map background is clicked.
+ * @fires marker-click - Emitted when a marker is clicked.
+ * @fires marker-placed - Emitted in place-mode when a position is selected.
+ */
 @customElement('gta-v-map')
 export class GtaVMap extends LitElement {
   static override readonly styles = gtaVMapStyles;
 
   // --- Leaflet CSS ---
 
+  /** URL to the Leaflet CSS stylesheet. Override to use a local copy. */
   @property({ type: String, attribute: 'leaflet-css-url' })
   leafletCssUrl = 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css';
 
@@ -43,6 +53,7 @@ export class GtaVMap extends LitElement {
 
   private _crs?: L.CRS;
 
+  /** Custom Leaflet CRS. When unset, the built-in GTA V CRS is used. */
   get crs(): L.CRS | undefined {
     return this._crs;
   }
@@ -53,72 +64,89 @@ export class GtaVMap extends LitElement {
 
   // --- Tile config ---
 
+  /** Base URL path for tile image folders. */
   @property({ type: String, attribute: 'tile-base-url' })
   tileBaseUrl: string = DEFAULT_MAP_CONFIG.tileBaseUrl;
 
+  /** Override URL template for the satellite tile layer. */
   @property({ type: String, attribute: 'satellite-url' })
   satelliteUrl?: string;
 
+  /** Override URL template for the atlas tile layer. */
   @property({ type: String, attribute: 'atlas-url' })
   atlasUrl?: string;
 
+  /** Override URL template for the grid tile layer. */
   @property({ type: String, attribute: 'grid-url' })
   gridUrl?: string;
 
   // --- Map config ---
 
+  /** Active map style (satellite, atlas, or grid). */
   @property({ type: String, attribute: 'default-style' })
   defaultStyle: MapStyle = DEFAULT_MAP_CONFIG.defaultStyle;
 
+  /** Current zoom level. */
   @property({ type: Number })
   zoom: number = DEFAULT_MAP_CONFIG.zoom;
 
+  /** Minimum allowed zoom level. */
   @property({ type: Number, attribute: 'min-zoom' })
   minZoom: number = DEFAULT_MAP_CONFIG.minZoom;
 
+  /** Maximum allowed zoom level. */
   @property({ type: Number, attribute: 'max-zoom' })
   maxZoom: number = DEFAULT_MAP_CONFIG.maxZoom;
 
   // --- Bounds config ---
 
+  /** Optional bounding box that restricts panning. Set to null to disable. */
   @property({ type: Array, attribute: 'max-bounds' })
   maxBounds: LatLngBoundsTuple | null = DEFAULT_MAP_CONFIG.maxBounds;
 
+  /** How strongly the map snaps back when dragged beyond max bounds (0..1). */
   @property({ type: Number, attribute: 'max-bounds-viscosity' })
   maxBoundsViscosity: number = DEFAULT_MAP_CONFIG.maxBoundsViscosity;
 
   // --- Blips/icons config ---
 
+  /** Base URL path for blip icon sprites (e.g. `blips/1.png`). */
   @property({ type: String, attribute: 'blips-url' })
   blipsUrl: string = DEFAULT_MAP_CONFIG.blipsUrl;
 
   // --- Layer control ---
 
+  /** When true, displays a Leaflet layer control for toggling base layers and overlays. */
   @property({ type: Boolean, attribute: 'show-layer-control' })
   showLayerControl = false;
 
   // --- Clustering ---
 
+  /** When true, markers are added to plain layer groups instead of MarkerClusterGroups. */
   @property({ type: Boolean, attribute: 'disable-clustering' })
   disableClustering = false;
 
   // --- Click-to-place ---
 
+  /** When true, clicking the map emits a `marker-placed` event with the clicked coordinates. */
   @property({ type: Boolean, attribute: 'place-mode' })
   placeMode = false;
 
   // --- Markers (declarative) ---
 
+  /** Declarative list of markers. Changes trigger a full re-sync. */
   @property({ type: Array })
   markers: GtaMarker[] = [];
 
   // --- Shapes (declarative) ---
 
+  /** Declarative list of shapes. Changes trigger a full re-sync. */
   @property({ type: Array })
   shapes: GtaShape[] = [];
 
   // --- Heatmap ---
 
+  /** When true, renders a heatmap layer derived from all marker positions. */
   @property({ type: Boolean, attribute: 'show-heatmap' })
   showHeatmap = false;
 
@@ -134,6 +162,11 @@ export class GtaVMap extends LitElement {
 
   // --- Imperative API: Markers ---
 
+  /**
+   * Adds or updates a marker on the map.
+   * @param marker - Marker definition to add or update.
+   * @returns The marker's unique id.
+   */
   addMarker(marker: GtaMarker): string {
     const oldGroup = this._markerEntries.find((e) => e.id === marker.id)?.group;
     const { entry, isUpdate } = upsertMarkerEntry(this._markerEntries, marker);
@@ -157,6 +190,11 @@ export class GtaVMap extends LitElement {
     return entry.id;
   }
 
+  /**
+   * Removes a marker by id.
+   * @param id - The marker's unique id.
+   * @returns `true` if the marker was found and removed.
+   */
   removeMarker(id: string): boolean {
     const index = this._markerEntries.findIndex((e) => e.id === id);
     if (index === -1) return false;
@@ -171,10 +209,12 @@ export class GtaVMap extends LitElement {
     return true;
   }
 
+  /** Returns a snapshot of all marker entries (without internal Leaflet references). */
   getMarkers(): ReadonlyArray<Omit<GtaMarkerEntry, '_leaflet'>> {
     return this._markerEntries.map(({ _leaflet, ...rest }) => rest);
   }
 
+  /** Removes all markers from the map. */
   clearMarkers(): void {
     for (const entry of this._markerEntries) {
       if (entry._leaflet) {
@@ -188,6 +228,11 @@ export class GtaVMap extends LitElement {
 
   // --- Imperative API: Shapes ---
 
+  /**
+   * Adds or updates a shape on the map.
+   * @param shape - Shape definition to add or update.
+   * @returns The shape's unique id.
+   */
   addShape(shape: GtaShape): string {
     const oldEntry = shape.id ? this._shapeEntries.find((e) => e.id === shape.id) : undefined;
     const oldGroup = oldEntry?.group;
@@ -213,6 +258,11 @@ export class GtaVMap extends LitElement {
     return entry.id;
   }
 
+  /**
+   * Removes a shape by id.
+   * @param id - The shape's unique id.
+   * @returns `true` if the shape was found and removed.
+   */
   removeShape(id: string): boolean {
     const index = this._shapeEntries.findIndex((e) => e.id === id);
     if (index === -1) return false;
@@ -227,10 +277,12 @@ export class GtaVMap extends LitElement {
     return true;
   }
 
+  /** Returns a snapshot of all shape entries (without internal Leaflet references). */
   getShapes(): ReadonlyArray<Omit<GtaShapeEntry, '_leaflet' | '_labelMarker'>> {
     return this._shapeEntries.map(({ _leaflet, _labelMarker, ...rest }) => rest);
   }
 
+  /** Removes all shapes from the map. */
   clearShapes(): void {
     for (const entry of this._shapeEntries) {
       const groupLayer = this._overlayGroups.get(entry.group);

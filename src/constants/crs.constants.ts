@@ -1,3 +1,4 @@
+/** Transformation parameters for converting GTA V game coordinates to Leaflet CRS. */
 export const GTA_CRS_CONFIG = {
   centerX: 117.3,
   centerY: 172.8,

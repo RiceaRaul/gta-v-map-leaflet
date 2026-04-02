@@ -5,6 +5,9 @@ import { generateId } from './id.utils.js';
 
 /**
  * Normalizes a GtaShape into a full GtaShapeEntry with defaults applied.
+ *
+ * @param shape - The consumer-provided shape definition.
+ * @returns A fully-resolved shape entry.
  */
 export function createShapeEntry(shape: GtaShape): GtaShapeEntry {
   return {
@@ -24,6 +27,10 @@ export function createShapeEntry(shape: GtaShape): GtaShapeEntry {
 
 /**
  * Upserts a shape entry into the entries array.
+ *
+ * @param entries - Mutable array of existing shape entries.
+ * @param shape - The consumer-provided shape to upsert.
+ * @returns The resolved entry and whether it was an update.
  */
 export function upsertShapeEntry(
   entries: GtaShapeEntry[],
@@ -46,7 +53,10 @@ export function upsertShapeEntry(
 }
 
 /**
- * Computes the centroid of a set of points.
+ * Computes the centroid (arithmetic mean) of a set of [x, y] points.
+ *
+ * @param points - Array of [x, y] coordinate pairs.
+ * @returns The centroid as [x, y]. Returns [0, 0] for an empty array.
  */
 export function computeCentroid(points: [number, number][]): [number, number] {
   if (points.length === 0) return [0, 0];
@@ -62,6 +72,9 @@ export function computeCentroid(points: [number, number][]): [number, number] {
 
 /**
  * Creates a Leaflet DivIcon for a shape label at the centroid.
+ *
+ * @param label - Label configuration (text, color, font size, etc.).
+ * @returns A zero-size DivIcon containing the styled label text.
  */
 export function createLabelIcon(label: ShapeLabel): L.DivIcon {
   const fontSize = label.fontSize ?? 12;
