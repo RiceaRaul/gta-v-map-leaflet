@@ -28,8 +28,6 @@ export {
   MAP_STYLES,
   DEFAULT_MAP_CONFIG,
   GTA_CRS_CONFIG,
-  MARKERCLUSTER_CSS_URL,
-  MARKERCLUSTER_DEFAULT_CSS_URL,
 } from './constants/index.js';
 
 // Utilities

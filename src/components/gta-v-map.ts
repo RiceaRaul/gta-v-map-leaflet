@@ -1,8 +1,10 @@
-import { LitElement, html, type PropertyValues } from 'lit';
+import { LitElement, html, unsafeCSS, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 import 'leaflet.heat';
+import markerClusterCss from 'leaflet.markercluster/dist/MarkerCluster.css?inline';
+import markerClusterDefaultCss from 'leaflet.markercluster/dist/MarkerCluster.Default.css?inline';
 import { createGtaCRS, generateId, upsertMarkerEntry, updateLeafletMarker, DEFAULT_MARKER_GROUP } from '../utils/index.js';
 import { upsertShapeEntry, computeCentroid, createLabelIcon } from '../utils/shape.utils.js';
 import {
@@ -12,8 +14,6 @@ import {
   STYLE_LABELS,
   MAP_STYLES,
   DEFAULT_MAP_CONFIG,
-  MARKERCLUSTER_CSS_URL,
-  MARKERCLUSTER_DEFAULT_CSS_URL,
 } from '../constants/index.js';
 import type {
   GtaMarker,
@@ -41,7 +41,11 @@ import { gtaVMapStyles } from './gta-v-map.styles.js';
  */
 @customElement('gta-v-map')
 export class GtaVMap extends LitElement {
-  static override readonly styles = gtaVMapStyles;
+  static override readonly styles = [
+    gtaVMapStyles,
+    unsafeCSS(markerClusterCss),
+    unsafeCSS(markerClusterDefaultCss),
+  ];
 
   // --- Leaflet CSS ---
 
@@ -241,14 +245,7 @@ export class GtaVMap extends LitElement {
 
     if (this._map) {
       if (isUpdate && entry._leaflet) {
-        // Remove old shape from its group
-        if (oldGroup) {
-          const oldLayer = this._overlayGroups.get(oldGroup);
-          if (oldLayer) {
-            oldLayer.removeLayer(entry._leaflet);
-            if (entry._labelMarker) oldLayer.removeLayer(entry._labelMarker);
-          }
-        }
+        this._removeShapeFromGroup(entry, oldGroup);
         entry._leaflet = undefined;
         entry._labelMarker = undefined;
       }
@@ -256,6 +253,14 @@ export class GtaVMap extends LitElement {
     }
 
     return entry.id;
+  }
+
+  private _removeShapeFromGroup(entry: GtaShapeEntry, group: string | undefined): void {
+    if (!group || !entry._leaflet) return;
+    const layer = this._overlayGroups.get(group);
+    if (!layer) return;
+    layer.removeLayer(entry._leaflet);
+    if (entry._labelMarker) layer.removeLayer(entry._labelMarker);
   }
 
   /**
@@ -297,16 +302,8 @@ export class GtaVMap extends LitElement {
   // --- Lifecycle ---
 
   override render() {
-    const clusterLinks = this.disableClustering
-      ? ''
-      : html`
-          <link rel="stylesheet" href="${MARKERCLUSTER_CSS_URL}">
-          <link rel="stylesheet" href="${MARKERCLUSTER_DEFAULT_CSS_URL}">
-        `;
-
     return html`
       <link rel="stylesheet" href="${this.leafletCssUrl}" @load=${this._onCssLoad}>
-      ${clusterLinks}
       <div id="map-container"></div>
     `;
   }
