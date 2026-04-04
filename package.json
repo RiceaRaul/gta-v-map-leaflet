@@ -1,6 +1,6 @@
 {
   "name": "gta-v-map",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "GTA V interactive map as a Lit web component",
   "license": "MIT",
   "author": "RiceaRaul",
