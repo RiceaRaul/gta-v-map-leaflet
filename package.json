@@ -2,6 +2,20 @@
   "name": "gta-v-map",
   "version": "2.0.0",
   "description": "GTA V interactive map as a Lit web component",
+  "license": "MIT",
+  "author": "RiceaRaul",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RiceaRaul/gta-v-map-leaflet.git"
+  },
+  "keywords": [
+    "gta",
+    "gta-v",
+    "map",
+    "leaflet",
+    "web-component",
+    "lit"
+  ],
   "type": "module",
   "main": "dist/gta-v-map.umd.js",
   "module": "dist/gta-v-map.es.js",

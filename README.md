@@ -33,15 +33,13 @@ L.marker([Y,X], {icon: customIcon(1)}).addTo(Icons["Example"]).bindPopup("I am h
 How use CustomIcon
 The parameter in the customIcon function is the name of the .png picture in the blips folder
 ```
-For /blips/1.png we will use customIcon(1)}
+For /blips/1.png we will use customIcon(1)
 ```
 ## Screenshots
 | Atlas         |   Grid        |    Satellite    | 
 | ------------- | ------------- | ----------------| 
-| !["Atlas Screenshot"](https://cdn.discordapp.com/attachments/691276350962794496/908677027530407966/unknown.png)  | !["Grid Screebshot"](https://cdn.discordapp.com/attachments/691276350962794496/908677312109764608/unknown.png)  |    !["Satellite Screenshot"](https://cdn.discordapp.com/attachments/691276350962794496/908676688043454495/unknown.png)             | 
+| !["Atlas Screenshot"](https://docs.ricearaul.com/gta-v-map/sattelite.png)  | !["Grid Screebshot"](https://docs.ricearaul.com//gta-v-map/atlas.png)  |    !["Satellite Screenshot"](https://docs.ricearaul.com//gta-v-map/grid.png)             | 
 
-Custom blip
-!["Customblip Screnshot"](https://cdn.discordapp.com/attachments/691276350962794496/908677500069109800/unknown.png)
 ## License
 
 GTA V MAP LEAFLET is licensed under MIT License.
