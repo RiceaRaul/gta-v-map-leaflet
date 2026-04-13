@@ -40,6 +40,20 @@ For /blips/1.png we will use customIcon(1)
 | ------------- | ------------- | ----------------| 
 | !["Atlas Screenshot"](https://docs.ricearaul.com/gta-v-map/sattelite.png)  | !["Grid Screebshot"](https://docs.ricearaul.com//gta-v-map/atlas.png)  |    !["Satellite Screenshot"](https://docs.ricearaul.com//gta-v-map/grid.png)             | 
 
+## Install via npm
+
+[![npm](https://img.shields.io/npm/v/gta-v-map)](https://www.npmjs.com/package/gta-v-map)
+
+```
+npm install gta-v-map
+```
+
+## Support
+
+If you find this project useful, consider supporting its development:
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/ricearaul)
+
 ## License
 
 GTA V MAP LEAFLET is licensed under MIT License.
